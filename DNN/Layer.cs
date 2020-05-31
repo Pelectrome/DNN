@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace DNN
 {
-    class Neuron
+    class Layer
     {
         #region Delegates
         private delegate double Activation_Functions(double Value);
@@ -26,11 +26,18 @@ namespace DNN
         };
         #endregion
 
-        public double[] Neurons;
+        #region Global Variables
+        public double[] Neurons { get; set; }
+        public double[] Delta { get; set; }
+        private int NeuronsLenth;
+        #endregion
 
-        public Neuron (int number, ActivationFunction activation_function)
-        {
-            Neurons = new double [number];
+        #region Constructors
+        public Layer(int number, ActivationFunction activation_function)
+        {  
+            NeuronsLenth = number;
+            Neurons = new double [NeuronsLenth];
+            Delta = new double[NeuronsLenth];
 
             switch (activation_function)
             {
@@ -55,14 +62,19 @@ namespace DNN
 
             }
         }
-        public void Activate ()
+        #endregion
+
+        #region Functions
+        public void Activate()
         {
-            for (int i = 0; i < Neurons.Length; i++)
+            for (int i = 0; i < NeuronsLenth; i++)
             {
                 Neurons[i] = Activation_Function(Neurons[i]);
             }
-        }
         
+        }
+        #endregion
+
         #region Activation Functions
         private double Sigmoid(double NeuralValue)
         {
