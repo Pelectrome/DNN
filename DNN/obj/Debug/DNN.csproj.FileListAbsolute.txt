@@ -1,1 +1,10 @@
 c:\users\pelectrome\documents\visual studio 2015\Projects\DNN\DNN\bin\Debug\DNN.exe.config
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\bin\Debug\DNN.exe.config
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\bin\Debug\DNN.exe
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\bin\Debug\DNN.pdb
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\obj\Debug\DNN.csprojResolveAssemblyReference.cache
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\obj\Debug\DNN.Form1.resources
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\obj\Debug\DNN.Properties.Resources.resources
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\obj\Debug\DNN.csproj.GenerateResource.Cache
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\obj\Debug\DNN.exe
+C:\Users\Pelectrome\Documents\GitHub\DNN\DNN\obj\Debug\DNN.pdb
