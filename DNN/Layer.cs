@@ -27,17 +27,23 @@ namespace DNN
         #endregion
 
         #region Global Variables
-        public double[] Neurons { get; set; }
+        private double[] Neurons;
+        public double this[int i]
+        {
+            get { return Neurons[i]; }
+            set { Neurons[i] = Activation_Function(value); }//activate neuron automatically
+        }
+
         public double[] Delta { get; set; }
-        private int NeuronsLenth;
+        public int Neurons_Length { get; }
         #endregion
 
         #region Constructors
         public Layer(int number, ActivationFunction activation_function)
         {  
-            NeuronsLenth = number;
-            Neurons = new double [NeuronsLenth];
-            Delta = new double[NeuronsLenth];
+            Neurons_Length = number;
+            Neurons = new double [Neurons_Length];
+            Delta = new double[Neurons_Length];
 
             switch (activation_function)
             {
@@ -64,14 +70,10 @@ namespace DNN
         }
         #endregion
 
-        #region Functions
-        public void Activate()
+        #region Methods
+        public void SetNeuron(int index,double value)
         {
-            for (int i = 0; i < NeuronsLenth; i++)
-            {
-                Neurons[i] = Activation_Function(Neurons[i]);
-            }
-        
+            Neurons[index] = value;
         }
         #endregion
 
