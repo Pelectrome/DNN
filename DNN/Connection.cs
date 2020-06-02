@@ -31,10 +31,12 @@ namespace DNN
 
             Random rand = new Random();//Initialize random weights and biases
             for (int i = 0; i < Weight_Length; i++)
-                Weight[i] = (double)rand.Next(-200, 200) / 1000;//get random from -0.2 to 0.2
+                Weight[i] = 2;
+            //Weight[i] = (double)rand.Next(-200, 200) / 1000;//get random from -0.2 to 0.2
 
             for (int i = 0; i < Bias_Length; i++)
-                Bias[i] = (double)rand.Next(-200, 200) / 1000;//end Initializing
+                Bias[i] = 0;
+               // Bias[i] = (double)rand.Next(-200, 200) / 1000;//end Initializing
 
 
         }
@@ -53,6 +55,7 @@ namespace DNN
                 Output_Layer[i] = Z + Bias[i];//set output layer neuron and it will activate automatically
 
             }
+
         }
     }
 }

@@ -26,15 +26,17 @@ namespace DNN
             L[1]=new Layer(2, Layer.ActivationFunction.Sigmoid);
             L[2]=new Layer(1, Layer.ActivationFunction.Sigmoid);
 
+
             Connection[] C = new Connection[2];
             C[0] = new Connection(L[0], L[1]);
             C[1] = new Connection(L[1], L[2]);
-            for (int i = 0; i < C.Length; i++)
-            {
-                C[i].FeedForward();
-            }
 
-            MessageBox.Show(L[2][0].ToString());
+            Model M = new Model(L, C,Model.CostFunctions.MeanSquareSrror);
+            double[] Input = { 1, 1 };
+            double[] Outupt = { 1 };
+            M.BackPropagation(Input, Outupt);
+   
+            MessageBox.Show(Outupt[0].ToString());
         }
 
   

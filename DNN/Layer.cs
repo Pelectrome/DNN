@@ -28,14 +28,25 @@ namespace DNN
 
         #region Global Variables
         private double[] Neurons;
+        private double[] Neurons_Buffer;
+
         public double this[int i]
         {
             get { return Neurons[i]; }
             set { Neurons[i] = Activation_Function(value); }//activate neuron automatically
         }
+        public double[] SetLayer
+        {
+            set { value.CopyTo(Neurons,0); }//set layer value
+        }
+        public double[] GetLayer
+        {
+            get { Neurons.CopyTo(Neurons_Buffer, 0); return Neurons_Buffer; }//get layer value
+        }
 
         public double[] Delta { get; set; }
         public int Neurons_Length { get; }
+        
         #endregion
 
         #region Constructors
@@ -43,13 +54,14 @@ namespace DNN
         {  
             Neurons_Length = number;
             Neurons = new double [Neurons_Length];
+            Neurons_Buffer = new double[Neurons_Length];
             Delta = new double[Neurons_Length];
 
             switch (activation_function)
             {
 
                 case ActivationFunction.Sigmoid:
-                    Activation_Function = Sigmoid;                
+                    Activation_Function = Sigmoid;
                     break;
                 case ActivationFunction.TanH:
                     Activation_Function = TanH;
@@ -63,17 +75,39 @@ namespace DNN
                 case ActivationFunction.BinaryStep:
                     Activation_Function = BinaryStep;
                     break;
+                case ActivationFunction.Softmax:
+                    Activation_Function = Softmax;
+                    break;
                 default:
-                    throw new ArgumentException("Not exict");
+                    throw new ArgumentException("Not Exist");
 
             }
         }
         #endregion
 
         #region Methods
-        public void SetNeuron(int index,double value)
+        public ActivationFunction GetActivatonFunction()
         {
-            Neurons[index] = value;
+            if (Activation_Function == Sigmoid)
+                return ActivationFunction.Sigmoid;
+
+            else if (Activation_Function == TanH)
+                return ActivationFunction.TanH;
+
+            else if (Activation_Function == ReLU)
+                return ActivationFunction.ReLU;
+
+            else if (Activation_Function == LeakyReLU)
+                return ActivationFunction.LeakyReLU;
+
+            else if (Activation_Function == BinaryStep)
+                return ActivationFunction.BinaryStep;
+
+            else if (Activation_Function == Softmax)
+                return ActivationFunction.Softmax;
+
+            throw new ArgumentException("Not Exist");        
+
         }
         #endregion
 
