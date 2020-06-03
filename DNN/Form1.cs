@@ -24,7 +24,7 @@ namespace DNN
             Layer[] L = new Layer[3];
             L[0]=new Layer(2, Layer.ActivationFunction.Sigmoid);
             L[1]=new Layer(2, Layer.ActivationFunction.Sigmoid);
-            L[2]=new Layer(1, Layer.ActivationFunction.Sigmoid);
+            L[2] = new Layer(1, Layer.ActivationFunction.Sigmoid);
 
 
             Connection[] C = new Connection[2];
@@ -33,10 +33,10 @@ namespace DNN
 
             Model M = new Model(L, C,Model.CostFunctions.MeanSquareSrror);
             double[] Input = { 1, 1 };
-            double[] Outupt = { 1 };
+            double[] Outupt = { 0 };
             M.BackPropagation(Input, Outupt);
-   
-            MessageBox.Show(Outupt[0].ToString());
+            
+            MessageBox.Show(L[0].Delta[0].ToString());
         }
 
   

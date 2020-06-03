@@ -85,6 +85,11 @@ namespace DNN
                 Layers[OLIndex].Delta[i] = Delta_OutputLayer(Output_Layer[i],target[i]);//set delta for output layer
             }
 
+            foreach (var item in Connections)
+            {
+                item.BackPropagateDelta();
+            }
+
         }
         #region Cost Functions
         private double DeltaMeanSquareErrorSigmoid(double Neural, double Target)
