@@ -37,6 +37,11 @@ namespace DNN
 
         private void button1_Click(object sender, EventArgs e)
         {
+            if (!isDouble(textBox1.Text) || !isDouble(textBox2.Text))
+            {
+                MessageBox.Show("invalid input");
+                return;
+            }
             double[] Input_Layer = new double[2];
             Input_Layer[0] = double.Parse(textBox1.Text);
             Input_Layer[1] = double.Parse(textBox2.Text);
@@ -44,6 +49,7 @@ namespace DNN
             double[] Output_Layer = M.FeedForward(Input_Layer);
             textBox3.Text = Output_Layer[0].ToString();
         }
+        
         bool OnTime = true;
         private void button2_Click(object sender, EventArgs e)
         {
@@ -89,6 +95,10 @@ namespace DNN
 
             double[] Output_Layer = M.FeedForward(Input_Layer);
             textBox3.Text = Output_Layer[0].ToString();
+        }
+        bool isDouble(string str)
+        {
+            return double.TryParse(str, out _);
         }
     }
     
