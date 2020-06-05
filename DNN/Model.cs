@@ -76,13 +76,15 @@ namespace DNN
             return Output_Layer;
         }
 
-        public void BackPropagation(double[] input, double[] target)
+        public double BackPropagation(double[] input, double[] target)
         {
             double[] Output_Layer = FeedForward(input);
+            double Error = 0;
 
             for (int i = 0; i < Output_Layer.Length; i++)
             {
                 Layers[OLIndex].Delta[i] = Delta_OutputLayer(Output_Layer[i],target[i]);//set delta for output layer
+                Error += Math.Abs(Output_Layer[i] - target[i]);
             }
 
             foreach (var item in Connections)
@@ -93,6 +95,9 @@ namespace DNN
             {
                 item.UpdateWeights(1);
             }
+
+            Error /= Output_Layer.Length;
+            return Error;
 
         }
         #region Cost Functions
