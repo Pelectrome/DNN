@@ -89,6 +89,10 @@ namespace DNN
             {
                 item.BackPropagateDelta();
             }
+            foreach (var item in Connections)
+            {
+                item.UpdateWeights(1);
+            }
 
         }
         #region Cost Functions

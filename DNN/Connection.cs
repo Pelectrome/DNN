@@ -46,12 +46,12 @@ namespace DNN
 
             Random rand = new Random();//Initialize random weights and biases
             for (int i = 0; i < WLength; i++)
-                Weight[i] = -20;
-           // Weight[i] = (double)rand.Next(-200, 200) / 1000;//get random from -0.2 to 0.2
+                //Weight[i] = 5;
+            Weight[i] = (double)rand.Next(-200, 200) / 100;//get random from -0.2 to 0.2
 
             for (int i = 0; i < BLength; i++)
-                Bias[i] = 0;
-            // Bias[i] = (double)rand.Next(-200, 200) / 1000;//end Initializing
+                //Bias[i] = 5;
+            Bias[i] = (double)rand.Next(-200, 200) / 100;//end Initializing
 
             switch (Input_Layer.GetActivatonFunction())//get input layer activation function and set the function derivative delegate
             {
@@ -131,6 +131,19 @@ namespace DNN
                 Input_Layer.Delta[i] = DeltaSum * Function_Derivative(Input_Layer[i]);//update delta of input layer
             }
 
+        }
+        public void UpdateWeights(double LearningRate = 0.1)
+        {
+            int WIndexer = 0;//Weight Indexer
+            for (int i = 0; i < OLLength; i++)
+            {
+                for (int j = 0; j < ILLength; j++)
+                {
+                    Weight[WIndexer] -= LearningRate * Input_Layer[j] * Output_Layer.Delta[i];
+                    WIndexer++;
+                }
+                Bias[i] -= LearningRate * Output_Layer.Delta[i];
+            }
         }
         #region Functions Derivative
         private double SigmoidDerivative(double Neural)
