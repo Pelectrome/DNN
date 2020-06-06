@@ -21,12 +21,12 @@ namespace DNN
         private double[] Weight;//weight array is one dimention for easy fast saving
         private double[] Bias;
 
-        private int[] WeightBackMap;//store map indexing for backprobagation
+        public int[] WeightBackMap;//store map indexing for backprobagation
 
         private int WLength;//Weigth Length
         private int BLength;//Bias Length
 
-        public Connection(Layer input_layer,Layer output_layer)
+        public Connection(Layer input_layer,Layer output_layer, Random rand )
         {
             Input_Layer = input_layer;//get input layer
             Output_Layer = output_layer;//get output layer
@@ -44,14 +44,14 @@ namespace DNN
 
             CreateWeightBackMap();//create weight back map for backprobagation 
 
-            Random rand = new Random();//Initialize random weights and biases
+           // Random rand = new Random();//Initialize random weights and biases
             for (int i = 0; i < WLength; i++)
-                //Weight[i] = 5;
-            Weight[i] = (double)rand.Next(-200, 200) / 100;//get random from -0.2 to 0.2
+                //Weight[i] = 0.1;
+           Weight[i] = (double)rand.Next(-200, 200) / 1000;//get random from -0.2 to 0.2
 
             for (int i = 0; i < BLength; i++)
-                //Bias[i] = 5;
-            Bias[i] = (double)rand.Next(-200, 200) / 100;//end Initializing
+               // Bias[i] = 0.1;
+            Bias[i] = (double)rand.Next(-200, 200) / 1000;//end Initializing
 
             switch (Input_Layer.GetActivatonFunction())//get input layer activation function and set the function derivative delegate
             {
@@ -118,17 +118,18 @@ namespace DNN
         }
         public void BackPropagateDelta()
         {
-            double DeltaSum = 0;
+           
             int WBMIndexer = 0;//WeightBackMap Indexer
 
             for (int i = 0; i < ILLength; i++)
             {
+                double DeltaSum = 0;
                 for (int j = 0; j < OLLength; j++)
                 {
-                    DeltaSum += Output_Layer.Delta[j] * Weight[WeightBackMap[WBMIndexer]];//sem delta of output layer
+                    DeltaSum += Output_Layer.Delta[j] * Weight[WeightBackMap[WBMIndexer]];//sum delta of output layer
                     WBMIndexer++;
                 }
-                Input_Layer.Delta[i] = DeltaSum * Function_Derivative(Input_Layer[i]);//update delta of input layer
+                Input_Layer.Delta[i] = DeltaSum * Function_Derivative(Input_Layer[i]);//update delta of input layer          
             }
 
         }
@@ -145,6 +146,7 @@ namespace DNN
                 Bias[i] -= LearningRate * Output_Layer.Delta[i];
             }
         }
+      
         #region Functions Derivative
         private double SigmoidDerivative(double Neural)
         {

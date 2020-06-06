@@ -155,9 +155,9 @@ namespace DNN
 
             if (SoftmaxIndexer == Neurons.Length)
             {
-                for (int i = 1; i < Neurons.Length; i++)//start from 1 to not recalculate the last neural twice
+                for (int i = 0; i < Neurons.Length - 1; i++)
                 {
-                    Neurons[Neurons.Length - 1 - i] /= SoftmaxSum;//softmax
+                    Neurons[i] /= SoftmaxSum;//softmax
                 }
                 double SoftmaxSumBuffer = SoftmaxSum;
                 SoftmaxIndexer = 0;

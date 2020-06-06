@@ -18,23 +18,50 @@ namespace DNN
             InitializeComponent();
         }
         Model M;
+        Dataset D;
+     
+
         private void Form1_Load(object sender, EventArgs e)
         {
 
+            Layer[] L = new Layer[4];
+            L[0] = new Layer(784, Layer.ActivationFunction.ReLU);
+            L[1] = new Layer(200, Layer.ActivationFunction.ReLU);
+            L[2] = new Layer(80, Layer.ActivationFunction.ReLU);
+            L[3] = new Layer(10, Layer.ActivationFunction.Sigmoid);
 
-            Layer[] L = new Layer[3];
-            L[0] = new Layer(2, Layer.ActivationFunction.Sigmoid);
-            L[1] = new Layer(2, Layer.ActivationFunction.Sigmoid);
-            L[2] = new Layer(1, Layer.ActivationFunction.Sigmoid);
-
-            Connection[] C = new Connection[2];
-            C[0] = new Connection(L[0], L[1]);
-            C[1] = new Connection(L[1], L[2]);
+            Random rand = new Random();
+            Connection[] C = new Connection[3];
+            C[0] = new Connection(L[0], L[1], rand);
+            C[1] = new Connection(L[1], L[2], rand);
+            C[2] = new Connection(L[2], L[3], rand);
 
             M = new Model(L, C, Model.CostFunctions.MeanSquareSrror);
-            Dataset D = new Dataset(10, 780);
-            D.LoadDataset("mnist_test.csv");
-            // MessageBox.Show(L[0].Delta[0].ToString());
+            D = new Dataset(784, 10);
+            D.LoadDataset("mnist_test1.csv");
+
+
+
+
+            //string w = null;
+
+            //    for (int i = 0; i < C[0].WeightBackMap.Length; i++)
+            //    {
+            //        w += C[0].WeightBackMap[i] + ",";
+            //    }
+            //for (int i = 0; i < C[1].WeightBackMap.Length; i++)
+            //{
+            //    w += (C[1].WeightBackMap[i]+25) + ",";
+            //}
+
+            //w += "\r\n";
+            //w += "\r\n";
+            //for (int i = 0; i < NN._WeightsBackMap.Length; i++)
+            //{
+            //    w+=NN._WeightsBackMap[NN._WeightsBackMap.Length-i-1] +",";
+            //}
+            //MessageBox.Show(w);
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -53,7 +80,7 @@ namespace DNN
             {
                 Thread.CurrentThread.IsBackground = true;
                 double Error = 1;
-                while (Error > 0.01f)
+                while (Error > 0.001f)
                 {
                     Error = LeanANDGate();
                 }
@@ -68,7 +95,7 @@ namespace DNN
             {
                 Thread.CurrentThread.IsBackground = true;
                 double Error = 1;
-                while (Error > 0.01f)
+                while (Error > 0.001f)
                 {
                     Error = LeanORGate();
                 }
@@ -82,7 +109,7 @@ namespace DNN
             {
                 Thread.CurrentThread.IsBackground = true;
                 double Error = 1;
-                while (Error > 0.01f)
+                while (Error > 0.001f)
                 {
                     Error = LeanXORGate();
                 }
@@ -194,7 +221,30 @@ namespace DNN
             //textBox3.Text = Output_Layer[0].ToString();
         }
 
+        private void button5_Click(object sender, EventArgs e)
+        {
+            new Thread(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    double Error = M.Train(D);
+                    Invoke(new Action(() =>
+                    {
+                        label1.Text = Error.ToString();
+                    }));
+                }
 
+
+
+            }).Start();
+
+
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 
 }

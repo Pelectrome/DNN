@@ -86,20 +86,32 @@ namespace DNN
                 Layers[OLIndex].Delta[i] = Delta_OutputLayer(Output_Layer[i],target[i]);//set delta for output layer
                 Error += Math.Abs(Output_Layer[i] - target[i]);
             }
+            for (int i = 0; i < Connections.Length; i++)
+            {
+                Connections[Connections.Length-1-i].BackPropagateDelta();
+            }
+            foreach (var item in Connections)
+            {
+                item.UpdateWeights(0.01);
+            }
 
-            foreach (var item in Connections)
-            {
-                item.BackPropagateDelta();
-            }
-            foreach (var item in Connections)
-            {
-                item.UpdateWeights(1);
-            }
 
             Error /= Output_Layer.Length;
             return Error;
 
         }
+        public double Train(Dataset dataset)
+        {
+            int Dataset_Length = dataset.Length/100;
+            double Error = 0;
+            for (int i = 0; i < Dataset_Length; i++)
+            {
+                Error += BackPropagation(dataset.InputDataset[i], dataset.LableDataset[i]);
+            }
+            Error /= Dataset_Length;
+            return Error;
+        }
+
         #region Cost Functions
         private double DeltaMeanSquareErrorSigmoid(double Neural, double Target)
         {
