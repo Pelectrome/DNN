@@ -37,7 +37,7 @@ namespace DNN
         }
         public double[] SetLayer
         {
-            set { value.CopyTo(Neurons,0); }//set layer value
+            set { value.CopyTo(Neurons,0); }//set layer values without activation
         }
         public double[] GetLayer
         {

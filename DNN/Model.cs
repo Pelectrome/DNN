@@ -18,64 +18,73 @@ namespace DNN
             CrossEntropy
         };
 
-        private Layer[] Layers;
-        private Connection[] Connections;
-        private int OLIndex;
+        private NeuralNetwork[] NeuralNetworks;
+        private NNConnection[] NNConnections;
 
-        public Model(Layer[] layers, Connection[] connections, CostFunctions cost_function)
+        private int ONNIndex;//Output Neural Network Index
+        private int OLIndex;//Output layer Index of output model
+
+        public Model(NeuralNetwork[] neural_networks, NNConnection[] neural_networks_Connections, CostFunctions cost_function, double learing_rate = 0.1)
         {
-            Layers = layers;
-            Connections = connections;
-            OLIndex = layers.Length - 1;
+            NeuralNetworks = neural_networks;
+            NNConnections = neural_networks_Connections;
+
+            ONNIndex = NeuralNetworks.Length - 1;
+            OLIndex = NeuralNetworks[ONNIndex].OLIndex;
 
             switch (cost_function)
             {
                 case CostFunctions.MeanSquareSrror:
 
-                    if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Sigmoid)
+                    if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Sigmoid)
                         Delta_OutputLayer = DeltaMeanSquareErrorSigmoid;
 
-                    else if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.TanH)
+                    else if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.TanH)
                         Delta_OutputLayer = DeltaMeanSquareErrorTanH;
 
                     break;
                 case CostFunctions.MeanAbsoluteError:
 
-                    if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Sigmoid)
+                    if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Sigmoid)
                         Delta_OutputLayer = DeltaMeanAbsoluteErrorSigmoid;
 
-                    else if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.TanH)
+                    else if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.TanH)
                         Delta_OutputLayer = DeltaMeanAbsoluteErrorTanH;
 
                     break;
                 case CostFunctions.CrossEntropy:
 
-                    if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Sigmoid)
+                    if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Sigmoid)
                         Delta_OutputLayer = DeltaCorssEntorpySigmoid;
 
-                    else if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.TanH)
+                    else if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.TanH)
                         Delta_OutputLayer = DeltaCorssEntorpyTanH;
 
-                    else if (Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Softmax)
+                    else if (NeuralNetworks[ONNIndex].Layers[OLIndex].GetActivatonFunction() == Layer.ActivationFunction.Softmax)
                         Delta_OutputLayer = DeltaCorssEntorpySoftmax;
 
                     break;
                 default:
                     throw new ArgumentException("Cost function can't be set");
             }
+
+            foreach (var item in NNConnections)
+            {
+                item.Model_Connection_LearningRate = learing_rate;
+            }
         }
         public double[] FeedForward(double[] input)
         {
-            Layers[0].SetLayer = input;
-            for (int i = 0; i < Connections.Length; i++)
+            NeuralNetworks[0].Layers[0].SetLayer = input;
+
+            for (int i = 0; i < NNConnections.Length; i++)
             {
-                Connections[i].FeedForward();
+                NNConnections[i].FeedForward();
             }
-            double[] Output_Layer = Layers[OLIndex].GetLayer;
-            
+            double[] Output_Layer = NeuralNetworks[ONNIndex].Layers[OLIndex].GetLayer;
+
             return Output_Layer;
         }
-
         public double BackPropagation(double[] input, double[] target)
         {
             double[] Output_Layer = FeedForward(input);
@@ -83,26 +92,25 @@ namespace DNN
 
             for (int i = 0; i < Output_Layer.Length; i++)
             {
-                Layers[OLIndex].Delta[i] = Delta_OutputLayer(Output_Layer[i],target[i]);//set delta for output layer
+                NeuralNetworks[ONNIndex].Layers[OLIndex].Delta[i] = Delta_OutputLayer(Output_Layer[i], target[i]);//set delta for output layer
                 Error += Math.Abs(Output_Layer[i] - target[i]);
             }
-            for (int i = 0; i < Connections.Length; i++)
+            for (int i = 0; i < NNConnections.Length; i++)
             {
-                Connections[Connections.Length-1-i].BackPropagateDelta();
+                NNConnections[NNConnections.Length - 1 - i].BackPropagateDelta();
             }
-            foreach (var item in Connections)
+            foreach (var item in NNConnections)
             {
-                item.UpdateWeights(0.01);
+                item.UpdateWeights();
             }
-
-
             Error /= Output_Layer.Length;
             return Error;
 
         }
+
         public double Train(Dataset dataset)
         {
-            int Dataset_Length = dataset.Length/100;
+            int Dataset_Length = dataset.Length / 100;
             double Error = 0;
             for (int i = 0; i < Dataset_Length; i++)
             {
@@ -111,7 +119,6 @@ namespace DNN
             Error /= Dataset_Length;
             return Error;
         }
-
         #region Cost Functions
         private double DeltaMeanSquareErrorSigmoid(double Neural, double Target)
         {

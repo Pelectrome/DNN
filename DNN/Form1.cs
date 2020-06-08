@@ -17,28 +17,42 @@ namespace DNN
         {
             InitializeComponent();
         }
+       
         Model M;
+        NeuralNetwork NNTEST;
         Dataset D;
      
 
         private void Form1_Load(object sender, EventArgs e)
         {
 
-            Layer[] L = new Layer[4];
-            L[0] = new Layer(784, Layer.ActivationFunction.ReLU);
-            L[1] = new Layer(200, Layer.ActivationFunction.ReLU);
-            L[2] = new Layer(80, Layer.ActivationFunction.ReLU);
-            L[3] = new Layer(10, Layer.ActivationFunction.Sigmoid);
+            Layer[] L1 = new Layer[2];
+            L1[0] = new Layer(784, Layer.ActivationFunction.ReLU);
+            L1[1] = new Layer(200, Layer.ActivationFunction.ReLU);
 
-            Random rand = new Random();
-            Connection[] C = new Connection[3];
-            C[0] = new Connection(L[0], L[1], rand);
-            C[1] = new Connection(L[1], L[2], rand);
-            C[2] = new Connection(L[2], L[3], rand);
+            Layer[] L2 = new Layer[2];
+            L2[0] = new Layer(80, Layer.ActivationFunction.ReLU);
+            L2[1] = new Layer(10, Layer.ActivationFunction.Softmax);
 
-            M = new Model(L, C, Model.CostFunctions.MeanSquareSrror);
+            LConnection[] C1 = new LConnection[1];
+            C1[0] = new LConnection(L1[0], L1[1]);
+
+            LConnection[] C2 = new LConnection[1];
+            C2[0] = new LConnection(L2[0], L2[1]);
+
+
+
+            NeuralNetwork[] NN = new NeuralNetwork[2];
+            NN[0] = new NeuralNetwork(L1, C1,0.01);
+            NN[1] = new NeuralNetwork(L2, C2,0.01);
+
+            NNConnection[] NNC = new NNConnection[1];
+            NNC[0] = new NNConnection(NN[0], NN[1]);
+
+            M = new Model(NN, NNC, Model.CostFunctions.CrossEntropy,0.01);
+
             D = new Dataset(784, 10);
-            D.LoadDataset("mnist_test1.csv");
+            D.LoadDataset("mnist_test.csv");
 
 
 
@@ -61,168 +75,37 @@ namespace DNN
             //    w+=NN._WeightsBackMap[NN._WeightsBackMap.Length-i-1] +",";
             //}
             //MessageBox.Show(w);
+            Layer[] LTEST = new Layer[4];
+            LTEST[0] = new Layer(784, Layer.ActivationFunction.ReLU);
+            LTEST[1] = new Layer(200, Layer.ActivationFunction.ReLU);
+            LTEST[2] = new Layer(80, Layer.ActivationFunction.ReLU);
+            LTEST[3] = new Layer(10, Layer.ActivationFunction.Softmax);
+            LConnection[] CTEST = new LConnection[3];
+            CTEST[0] = new LConnection(LTEST[0], LTEST[1]);
+            CTEST[1] = new LConnection(LTEST[1], LTEST[2]);
+            CTEST[2] = new LConnection(LTEST[2], LTEST[3]);
+
+            NNTEST = new NeuralNetwork(LTEST, CTEST, NeuralNetwork.CostFunctions.CrossEntropy, 0.01);
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
-        {
-            double[] Input_Layer = new double[2];
-            Input_Layer[0] = double.Parse(textBox1.Text);
-            Input_Layer[1] = double.Parse(textBox2.Text);
-
-            double[] Output_Layer = M.FeedForward(Input_Layer);
-            textBox3.Text = Output_Layer[0].ToString();
-        }
-
-        private void button2_Click(object sender, EventArgs e)
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                double Error = 1;
-                while (Error > 0.001f)
-                {
-                    Error = LeanANDGate();
-                }
-                MessageBox.Show("done");
-
-            }).Start();
-
-        }
-        private void button3_Click(object sender, EventArgs e)
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                double Error = 1;
-                while (Error > 0.001f)
-                {
-                    Error = LeanORGate();
-                }
-                MessageBox.Show("done");
-
-            }).Start();
-        }
-        private void button4_Click(object sender, EventArgs e)
-        {
-            new Thread(() =>
-            {
-                Thread.CurrentThread.IsBackground = true;
-                double Error = 1;
-                while (Error > 0.001f)
-                {
-                    Error = LeanXORGate();
-                }
-                MessageBox.Show("done");
-
-            }).Start();
-        }
-
-        private double LeanANDGate()
-        {
-            double[] Input_Layer = new double[2];
-            double[] Target_Output_Layer = new double[1];
-            double Error = 0;
-            Input_Layer[0] = 0;
-            Input_Layer[1] = 0;
-            Target_Output_Layer[0] = 0;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 1;
-            Input_Layer[1] = 1;
-            Target_Output_Layer[0] = 1;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 1;
-            Input_Layer[1] = 0;
-            Target_Output_Layer[0] = 0;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 0;
-            Input_Layer[1] = 1;
-            Target_Output_Layer[0] = 0;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Error /= 4;
-            return Error;
-            //double[] Output_Layer = M.FeedForward(Input_Layer);
-            //textBox3.Text = Output_Layer[0].ToString();
-        }
-        private double LeanORGate()
-        {
-            double[] Input_Layer = new double[2];
-            double[] Target_Output_Layer = new double[1];
-            double Error = 0;
-            Input_Layer[0] = 0;
-            Input_Layer[1] = 0;
-            Target_Output_Layer[0] = 0;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 1;
-            Input_Layer[1] = 1;
-            Target_Output_Layer[0] = 1;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 1;
-            Input_Layer[1] = 0;
-            Target_Output_Layer[0] = 1;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 0;
-            Input_Layer[1] = 1;
-            Target_Output_Layer[0] = 1;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Error /= 4;
-            return Error;
-            //double[] Output_Layer = M.FeedForward(Input_Layer);
-            //textBox3.Text = Output_Layer[0].ToString();
-        }
-        private double LeanXORGate()
-        {
-            double[] Input_Layer = new double[2];
-            double[] Target_Output_Layer = new double[1];
-            double Error = 0;
-            Input_Layer[0] = 0;
-            Input_Layer[1] = 0;
-            Target_Output_Layer[0] = 0;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 1;
-            Input_Layer[1] = 1;
-            Target_Output_Layer[0] = 0;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 1;
-            Input_Layer[1] = 0;
-            Target_Output_Layer[0] = 1;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Input_Layer[0] = 0;
-            Input_Layer[1] = 1;
-            Target_Output_Layer[0] = 1;
-
-            Error += M.BackPropagation(Input_Layer, Target_Output_Layer);
-
-            Error /= 4;
-            return Error;
-            //double[] Output_Layer = M.FeedForward(Input_Layer);
-            //textBox3.Text = Output_Layer[0].ToString();
-        }
-
+    
         private void button5_Click(object sender, EventArgs e)
         {
+            new Thread(() =>
+            {
+                for (int i = 0; i < 1000; i++)
+                {
+                    double Error = NNTEST.Train(D);
+                    Invoke(new Action(() =>
+                    {
+                        label1.Text = Error.ToString();
+                    }));
+                }
+
+
+
+            }).Start();
             new Thread(() =>
             {
                 for (int i = 0; i < 1000; i++)
@@ -230,7 +113,7 @@ namespace DNN
                     double Error = M.Train(D);
                     Invoke(new Action(() =>
                     {
-                        label1.Text = Error.ToString();
+                        label2.Text = Error.ToString();
                     }));
                 }
 
