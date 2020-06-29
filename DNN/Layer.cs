@@ -8,6 +8,7 @@ namespace DNN
 {
     class Layer
     {
+
         #region Delegates
         private delegate double Activation_Functions(double Value);
         Activation_Functions Activation_Function;
@@ -168,8 +169,6 @@ namespace DNN
             return ActivationValue;//softmax
         }
         #endregion
-
-       
 
     }
 }

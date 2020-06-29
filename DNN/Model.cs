@@ -110,11 +110,11 @@ namespace DNN
 
         public double Train(Dataset dataset)
         {
-            int Dataset_Length = dataset.Length / 100;
+            int Dataset_Length = dataset.TrainingLength ;
             double Error = 0;
             for (int i = 0; i < Dataset_Length; i++)
             {
-                Error += BackPropagation(dataset.InputDataset[i], dataset.LableDataset[i]);
+                Error += BackPropagation(dataset.TrainingInput[i], dataset.TrainingLable[i]);
             }
             Error /= Dataset_Length;
             return Error;

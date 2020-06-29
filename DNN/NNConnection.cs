@@ -23,7 +23,9 @@ namespace DNN
         {
             Input_Neural_Nerwork= input_neural_network;
             Output_Neural_Nerwork = output_neural_network;
-            Model_Connection = new LConnection(Input_Neural_Nerwork.Layers[Input_Neural_Nerwork.Layers.Length - 1], Output_Neural_Nerwork.Layers[0]);//connect output layer of first model to the input layer of second model
+            Random rand = new Random();
+
+            Model_Connection = new LConnection(Input_Neural_Nerwork.Layers[Input_Neural_Nerwork.Layers.Length - 1], Output_Neural_Nerwork.Layers[0],rand);//connect output layer of first model to the input layer of second model
 
         }
         public void FeedForward()

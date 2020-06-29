@@ -9,8 +9,12 @@ namespace DNN
 
     class LConnection
     {
+        #region Delegates
         private delegate double Functions_Derivative(double neural);
         Functions_Derivative Function_Derivative;
+        #endregion
+
+        #region Global Variables
 
         private Layer Input_Layer;
         private Layer Output_Layer;
@@ -28,7 +32,10 @@ namespace DNN
 
         public double LearningRate { get; set; }
 
-        public LConnection(Layer input_layer,Layer output_layer)
+        #endregion
+
+        #region Constructors
+        public LConnection(Layer input_layer,Layer output_layer,Random rand)
         {
             Input_Layer = input_layer;//get input layer
             Output_Layer = output_layer;//get output layer
@@ -39,6 +46,8 @@ namespace DNN
             WLength = OLLength * ILLength;//get weight array length
             BLength = Output_Layer.Neurons_Length;//get bias array length
 
+            LearningRate = 0.1;//default learnig rate 
+
             Weight = new double[WLength];//create weight array 
             Bias = new double[BLength];//create bias array
 
@@ -46,16 +55,14 @@ namespace DNN
 
             CreateWeightBackMap();//create weight back map for backprobagation 
 
-           Random rand = new Random();//Initialize random weights and biases
+           //Random rand = new Random();//Initialize random weights and biases
             for (int i = 0; i < WLength; i++)
                 //Weight[i] = 0.1;
            Weight[i] = (double)rand.Next(-200, 200) / 1000;//get random from -0.2 to 0.2
 
             for (int i = 0; i < BLength; i++)
                // Bias[i] = 0.1;
-            Bias[i] = (double)rand.Next(-200, 200) / 1000;//end Initializing
-
-            LearningRate = 0.1;//default learnig rate 
+            Bias[i] = (double)rand.Next(-200, 200) / 1000;//end Initializing     
 
             switch (Input_Layer.GetActivatonFunction())//get input layer activation function and set the function derivative delegate
             {
@@ -83,6 +90,10 @@ namespace DNN
             }
 
         }
+        #endregion
+
+        #region Methods
+
         private void CreateWeightBackMap()
         {
             /* get transpose matrix n*m full with whole numbers  ex 
@@ -104,30 +115,29 @@ namespace DNN
                 }
             }
         }
+
         public void FeedForward()
         {
             int WeightIndex = 0;//weight indexer
-
+            double Z = 0;
             for (int i = 0; i < OLLength; i++)
             {
-                double Z = 0;
+                Z = 0;//reset Z
                 for (int j = 0; j < ILLength; j++)
                 {
                     Z += Input_Layer[j] * Weight[WeightIndex];//first index of output neurons = sum of input layer * weigts
                     WeightIndex++;
                 }
-                Output_Layer[i] = Z + Bias[i];//set output layer neuron and it will activate automatically
-
+                Output_Layer[i] = Z + Bias[i];//set output layer neuron and it will activate automatically               
             }
         }
         public void BackPropagateDelta()
-        {
-           
+        {     
             int WBMIndexer = 0;//WeightBackMap Indexer
-
+            double DeltaSum = 0;
             for (int i = 0; i < ILLength; i++)
             {
-                double DeltaSum = 0;
+                DeltaSum = 0;//reset DeltaSum
                 for (int j = 0; j < OLLength; j++)
                 {
                     DeltaSum += Output_Layer.Delta[j] * Weight[WeightBackMap[WBMIndexer]];//sum delta of output layer
@@ -151,7 +161,55 @@ namespace DNN
             }
         }
       
-        #region Functions Derivative
+        public void FeedBackward()
+        {
+            int WeightIndex = 0;//weight indexer
+            double Z = 0;
+            for (int i = 0; i < ILLength; i++)
+            {
+                Z = 0;
+                for (int j = 0; j < OLLength; j++)
+                {
+                    Z += Output_Layer[j] * Weight[WeightBackMap[WeightIndex]];//first index of output neurons = sum of input layer * weigts
+                    WeightIndex++;
+                }
+                Input_Layer[i] = Z;//set output layer neuron and it will activate automatically
+
+            }
+        }
+        public void ForwardPropagateDelta()
+        {
+            int WBMIndexer = 0;//WeightBackMap Indexer
+            double DeltaSum = 0;
+            for (int i = 0; i < OLLength; i++)
+            {
+                DeltaSum = 0;
+                for (int j = 0; j < ILLength; j++)
+                {
+                    DeltaSum += Input_Layer.Delta[j] * Weight[WBMIndexer];//sum delta of output layer
+                    WBMIndexer++;
+                }
+                Output_Layer.Delta[i] = DeltaSum * Function_Derivative(Output_Layer[i]);//update delta of input layer          
+            }
+
+        }
+        public void UpdateWeightsBackward()
+        {
+            int WIndexer = 0;//Weight Indexer
+            for (int i = 0; i < ILLength; i++)
+            {
+                for (int j = 0; j < OLLength; j++)
+                {
+                    Weight[WeightBackMap[WIndexer]] -= LearningRate * Output_Layer[j] * Input_Layer.Delta[i];
+                    WIndexer++;
+                }              
+            }
+        }
+
+        #endregion
+
+        #region Derivative Functions 
+
         private double SigmoidDerivative(double Neural)
         {
             return (Neural * (1 - Neural));
